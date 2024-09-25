@@ -1,0 +1,303 @@
+definitions:
+  models.Pet:
+    properties:
+      age:
+        type: integer
+      breed:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      species:
+        type: string
+    type: object
+  models.User:
+    properties:
+      _id:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для подбора домашних животных
+  title: Pet Management API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Выполняет вход в аккаунт пользоваетля по username и password
+      parameters:
+      - description: username и password пользователя
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Выполняет вход в аккаунт пользоваетля
+      tags:
+      - Пользователи
+  /pets:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список домашних животных по заданным параметрам фильтрации
+      parameters:
+      - description: ID домашнего животного
+        in: query
+        name: petid
+        type: integer
+      - description: Имя домашнего животного
+        in: query
+        name: name
+        type: string
+      - description: Возраст
+        in: query
+        name: age
+        type: integer
+      - description: Пол
+        in: query
+        name: gender
+        type: string
+      - description: Вид домашнего животного
+        in: query
+        name: species
+        type: string
+      - description: Порода
+        in: query
+        name: breed
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Pet'
+            type: array
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение списка домашних животных
+      tags:
+      - Домашние животные
+    post:
+      consumes:
+      - application/json
+      description: создает новое домашнее животное в системе
+      parameters:
+      - description: Информация о питомце
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: status
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать новое домажнее животное
+      tags:
+      - Домашние животные
+  /pets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет домашнее животное по ID
+      parameters:
+      - description: ID домашнего животного
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: status
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удаление домашнего животного
+      tags:
+      - Домашние животные
+    get:
+      consumes:
+      - application/json
+      description: Возвращает информацию о домашнем животном по ID
+      parameters:
+      - description: ID домашнего животного
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Pet'
+        "404":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение домашнего животного
+      tags:
+      - Домашние животные
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные домашнего животного по ID
+      parameters:
+      - description: ID домашнего животного
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые данные домашнего животного
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/models.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: status
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление данных домашнего животного
+      tags:
+      - Домашние животные
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрирует нового пользователя
+      parameters:
+      - description: New user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: status
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Регистрирует пользователя
+      tags:
+      - Пользователи
+swagger: "2.0"
