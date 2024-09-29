@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Middleware для проверки JWT
-func AuthMiddleware(requiredRole string) gin.HandlerFunc {
+// Authenticate для проверки JWT
+func Authenticate(requiredRole string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

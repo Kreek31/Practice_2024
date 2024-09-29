@@ -13,11 +13,11 @@ import (
 )
 
 type PetHandler struct {
-	db *databases.MongoDB
+	database *databases.MongoDB
 }
 
-func NewPetHandler(db *databases.MongoDB) *PetHandler {
-	return &PetHandler{db: db}
+func CreatePetHandler(database *databases.MongoDB) *PetHandler {
+	return &PetHandler{database: database}
 }
 
 // GetPet получает информацию о домашнем животном по ID
@@ -31,9 +31,9 @@ func NewPetHandler(db *databases.MongoDB) *PetHandler {
 // @Failure 404 {object} map[string]string "error"
 // @Failure 500 {object} map[string]string "error"
 // @Router /pets/{id} [get]
-func (h *PetHandler) GetPet(c *gin.Context) {
+func (handler *PetHandler) GetPet(c *gin.Context) {
 	id := c.Param("id")
-	collection := h.db.Collection("pets")
+	collection := handler.database.Collection("pets")
 
 	var pet models.Pet
 	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&pet)
@@ -48,6 +48,7 @@ func (h *PetHandler) GetPet(c *gin.Context) {
 	c.JSON(http.StatusOK, pet)
 }
 
+// CreatePet добавляет нового питомца в базу данных
 // @Summary Создать новое домажнее животное
 // @Description создает новое домашнее животное в системе
 // @Tags Домашние животные
@@ -58,14 +59,14 @@ func (h *PetHandler) GetPet(c *gin.Context) {
 // @Failure 400 {object} map[string]string "error"
 // @Failure 500 {object} map[string]string "error"
 // @Router /pets [post]
-func (h *PetHandler) CreatePet(c *gin.Context) {
+func (handler *PetHandler) CreatePet(c *gin.Context) {
 	var pet models.Pet
 	if err := c.ShouldBindJSON(&pet); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	collection := h.db.Collection("pets")
+	collection := handler.database.Collection("pets")
 	_, err := collection.InsertOne(context.TODO(), pet)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create pet"})
@@ -90,8 +91,8 @@ func (h *PetHandler) CreatePet(c *gin.Context) {
 // @Success 200 {array} models.Pet
 // @Failure 500 {object} map[string]string "error"
 // @Router /pets [get]
-func (h *PetHandler) GetPets(c *gin.Context) {
-	collection := h.db.Collection("pets")
+func (handler *PetHandler) GetPets(c *gin.Context) {
+	collection := handler.database.Collection("pets")
 
 	// Построение фильтра на основе параметров запроса
 	filter := bson.M{}
@@ -169,7 +170,7 @@ func (h *PetHandler) GetPets(c *gin.Context) {
 // @Failure 404 {object} map[string]string "error"
 // @Failure 500 {object} map[string]string "error"
 // @Router /pets/{id} [put]
-func (h *PetHandler) UpdatePet(c *gin.Context) {
+func (handler *PetHandler) UpdatePet(c *gin.Context) {
 	id := c.Param("id")
 
 	// Преобразование id из строки в ObjectID
@@ -199,7 +200,7 @@ func (h *PetHandler) UpdatePet(c *gin.Context) {
 		},
 	}
 
-	collection := h.db.Collection("pets")
+	collection := handler.database.Collection("pets")
 	result, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
@@ -215,7 +216,7 @@ func (h *PetHandler) UpdatePet(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "pet updated"})
 }
 
-// DeletePet удаляет домашнее животное по ID
+// DeletePet удаляет домашнее животное из базы данных по ID
 // @Summary Удаление домашнего животного
 // @Description Удаляет домашнее животное по ID
 // @Tags Домашние животные
@@ -227,7 +228,7 @@ func (h *PetHandler) UpdatePet(c *gin.Context) {
 // @Failure 404 {object} map[string]string "error"
 // @Failure 500 {object} map[string]string "error"
 // @Router /pets/{id} [delete]
-func (h *PetHandler) DeletePet(c *gin.Context) {
+func (handler *PetHandler) DeletePet(c *gin.Context) {
 	id := c.Param("id")
 
 	// Преобразование строки в ObjectID
@@ -240,7 +241,7 @@ func (h *PetHandler) DeletePet(c *gin.Context) {
 	// Фильтр для удаления по _id
 	filter := bson.M{"_id": objectID}
 
-	collection := h.db.Collection("pets")
+	collection := handler.database.Collection("pets")
 	result, err := collection.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete pet"})

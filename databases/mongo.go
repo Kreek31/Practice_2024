@@ -13,8 +13,7 @@ type MongoDB struct {
 	Client *mongo.Client
 }
 
-func ConnectMongo() (*MongoDB, error) {
-	// Использование переменной окружения для строки подключения
+func Connect() (*MongoDB, error) {
 	uri := os.Getenv("MONGO_URI")
 	if uri == "" {
 		uri = "mongodb://localhost:27017" // Значение по умолчанию
@@ -36,10 +35,10 @@ func ConnectMongo() (*MongoDB, error) {
 	return &MongoDB{Client: client}, nil
 }
 
-func (db *MongoDB) Disconnect() error {
-	return db.Client.Disconnect(context.TODO())
+func (database *MongoDB) Disconnect() error {
+	return database.Client.Disconnect(context.TODO())
 }
 
-func (db *MongoDB) Collection(name string) *mongo.Collection {
-	return db.Client.Database("testdb").Collection(name)
+func (database *MongoDB) Collection(name string) *mongo.Collection {
+	return database.Client.Database("testdb").Collection(name)
 }

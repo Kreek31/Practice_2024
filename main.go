@@ -20,14 +20,14 @@ import (
 func main() {
 
 	router := gin.Default()
-	db, err := databases.ConnectMongo()
-	petHandler := handlers.NewPetHandler(db)
-	userHandler := handlers.NewUserHandler(db)
+	database, err := databases.Connect()
+	petHandler := handlers.CreatePetHandler(database)
+	userHandler := handlers.CreateUserHandler(database)
 
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
-	defer db.Disconnect()
+	defer database.Disconnect()
 
 	// Публичные маршруты
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -38,7 +38,7 @@ func main() {
 
 	// Защищенные маршруты (только для админов)
 	adminRoutes := router.Group("/admin")
-	adminRoutes.Use(middlewares.AuthMiddleware("admin"))
+	adminRoutes.Use(middlewares.Authenticate("admin"))
 	{
 		adminRoutes.POST("/pets", petHandler.CreatePet)
 		adminRoutes.PUT("/pets", petHandler.UpdatePet)
